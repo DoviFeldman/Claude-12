@@ -1,0 +1,50 @@
+{
+  "name": "finder-viewer",
+  "productName": "Finder Viewer",
+  "version": "1.0.0",
+  "description": "A macOS Finder-style file viewer with per-day grouping, Quick Look, and lazy thumbnails",
+  "main": "main.js",
+  "author": "FunCorporateLife",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --mac",
+    "dist:dir": "electron-builder --mac dir"
+  },
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "three": "0.147.0"
+  },
+  "build": {
+    "appId": "com.funcorporatelife.finderviewer",
+    "productName": "Finder Viewer",
+    "asar": true,
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer/**/*",
+      "node_modules/three/package.json",
+      "node_modules/three/build/three.min.js",
+      "node_modules/three/examples/js/loaders/STLLoader.js",
+      "node_modules/three/examples/js/loaders/3MFLoader.js",
+      "node_modules/three/examples/js/controls/OrbitControls.js",
+      "node_modules/three/examples/js/libs/fflate.min.js"
+    ],
+    "mac": {
+      "category": "public.app-category.utilities",
+      "minimumSystemVersion": "10.15.0",
+      "darkModeSupport": true,
+      "identity": null,
+      "target": [
+        { "target": "dmg", "arch": ["universal"] },
+        { "target": "zip", "arch": ["universal"] }
+      ]
+    },
+    "dmg": {
+      "writeUpdateInfo": false
+    }
+  }
+}
