@@ -7,6 +7,11 @@ const os = require('os');
 let win = null;
 let dirWatcher = null;
 
+// --smoke-test: boot the app, wait for the renderer to report it finished
+// initializing, print all renderer console output, and exit 0/1. Used by CI
+// on the macOS runner to prove the packaged app actually runs.
+const SMOKE_TEST = process.argv.includes('--smoke-test');
+
 // ---------------------------------------------------------------------------
 // qlfile:// protocol — serves local files to the renderer (images, video,
 // audio, PDF) with streaming support so <video> can seek.
@@ -421,6 +426,30 @@ function createWindow() {
       spellcheck: false
     }
   });
+  if (SMOKE_TEST) {
+    const wc = win.webContents;
+    wc.on('console-message', (e, level, message, line, sourceId) => {
+      console.log(`[renderer:${level}] ${sourceId}:${line} ${message}`);
+    });
+    wc.on('did-fail-load', (e, code, desc, url) => {
+      console.error(`[did-fail-load] ${code} ${desc} ${url}`);
+    });
+    wc.on('preload-error', (e, preloadPath, err) => {
+      console.error(`[preload-error] ${preloadPath}: ${err}`);
+    });
+    wc.on('render-process-gone', (e, details) => {
+      console.error(`[render-process-gone] ${JSON.stringify(details)}`);
+    });
+    const timer = setTimeout(() => {
+      console.error('SMOKE FAIL: renderer did not finish init within 25s');
+      app.exit(1);
+    }, 25000);
+    ipcMain.on('smoke-ok', () => {
+      clearTimeout(timer);
+      console.log('SMOKE OK: renderer initialized successfully');
+      app.exit(0);
+    });
+  }
   win.loadFile(path.join(__dirname, 'renderer', 'index.html'));
   win.on('closed', () => { win = null; });
 }

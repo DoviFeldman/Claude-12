@@ -5,6 +5,7 @@
 // Loud, on-screen error reporting — a silent blank window is undebuggable
 // ---------------------------------------------------------------------------
 function showFatalError(msg) {
+  console.error('FATAL: ' + msg);
   let box = document.getElementById('fatal-error');
   if (!box) {
     box = document.createElement('div');
@@ -1101,4 +1102,6 @@ async function initInner() {
 
   // Remember last folder
   setInterval(() => { if (state.cwd) api.setPrefs({ lastDir: state.cwd }); }, 4000);
+
+  if (api.smokeOk) api.smokeOk();
 }

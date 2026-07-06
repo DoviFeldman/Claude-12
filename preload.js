@@ -24,5 +24,6 @@ contextBridge.exposeInMainWorld('api', {
   onDirChanged: (cb) => ipcRenderer.on('dir-changed', (e, dir) => cb(dir)),
   onMenu: (cb) => ipcRenderer.on('menu', (e, cmd) => cb(cmd)),
 
-  startDrag: (paths) => ipcRenderer.send('start-drag', paths)
+  startDrag: (paths) => ipcRenderer.send('start-drag', paths),
+  smokeOk: () => ipcRenderer.send('smoke-ok')
 });

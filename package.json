@@ -1,7 +1,7 @@
 {
   "name": "finder-viewer",
   "productName": "Finder Viewer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A macOS Finder-style file viewer with per-day grouping, Quick Look, and lazy thumbnails",
   "main": "main.js",
   "author": "FunCorporateLife",
@@ -22,6 +22,7 @@
     "appId": "com.funcorporatelife.finderviewer",
     "productName": "Finder Viewer",
     "asar": true,
+    "artifactName": "Finder-Viewer-mac.${ext}",
     "files": [
       "main.js",
       "preload.js",
