@@ -1,0 +1,66 @@
+name: Build macOS app
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - claude/macos-finder-viewer-electron-03uyrh
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build (dmg + zip, universal)
+        run: npx electron-builder --mac --publish never
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Finder-Viewer-mac
+          path: |
+            dist/*.dmg
+            dist/*.zip
+
+      - name: Publish tagged release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.dmg
+            dist/*.zip
+
+      - name: Publish rolling "Latest Build" release
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Latest Build
+          prerelease: true
+          body: |
+            Automatic build of the most recent commit (${{ github.sha }}).
+
+            **Download the `.dmg`**, open it, and drag Finder Viewer into Applications.
+            The app is unsigned — the first time, right-click the app and choose **Open**.
+            If macOS claims the app is "damaged", run:
+            `xattr -cr "/Applications/Finder Viewer.app"`
+          files: |
+            dist/*.dmg
+            dist/*.zip

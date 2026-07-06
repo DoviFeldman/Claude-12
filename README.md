@@ -2,6 +2,17 @@
 
 A macOS Finder-style file viewer built with Electron, styled after Big Sur.
 
+## Download
+
+**[⬇ Download the latest macOS build](https://github.com/DoviFeldman/Claude-12/releases/latest)** — grab the `.dmg`, open it, and drag **Finder Viewer** into Applications. Works on Intel and Apple Silicon Macs (macOS 10.15 Catalina or later).
+
+Every push to this repo automatically rebuilds the app on a macOS runner (GitHub Actions) and refreshes the [Releases page](https://github.com/DoviFeldman/Claude-12/releases).
+
+> **First launch:** the app is unsigned, so macOS will warn you. Right-click the app → **Open** → Open. If macOS says the app is "damaged", clear the quarantine flag with:
+> ```bash
+> xattr -cr "/Applications/Finder Viewer.app"
+> ```
+
 ## Features
 
 - **Grouped by day** — every file is filed under the day it was created/downloaded (no bunching old files by month/year). Empty days simply don't appear.
