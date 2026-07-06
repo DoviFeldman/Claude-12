@@ -1,6 +1,10 @@
 'use strict';
 /* Finder Viewer — renderer */
 
+// Everything lives inside this IIFE: contextBridge globals like window.api
+// are non-configurable, so a top-level `const api` would be a SyntaxError.
+(() => {
+
 // ---------------------------------------------------------------------------
 // Loud, on-screen error reporting — a silent blank window is undebuggable
 // ---------------------------------------------------------------------------
@@ -1105,3 +1109,5 @@ async function initInner() {
 
   if (api.smokeOk) api.smokeOk();
 }
+
+})();
