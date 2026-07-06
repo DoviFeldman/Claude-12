@@ -1,7 +1,7 @@
 {
   "name": "finder-viewer",
   "productName": "Finder Viewer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A macOS Finder-style file viewer with per-day grouping, Quick Look, and lazy thumbnails",
   "main": "main.js",
   "author": "FunCorporateLife",
@@ -37,6 +37,11 @@
       "category": "public.app-category.utilities",
       "minimumSystemVersion": "10.15.0",
       "darkModeSupport": true,
+      "extendInfo": {
+        "NSDownloadsFolderUsageDescription": "Finder Viewer browses and manages files in your Downloads folder.",
+        "NSDocumentsFolderUsageDescription": "Finder Viewer browses and manages files in your Documents folder.",
+        "NSDesktopFolderUsageDescription": "Finder Viewer browses and manages files on your Desktop."
+      },
       "identity": null,
       "target": [
         { "target": "dmg", "arch": ["universal"] },

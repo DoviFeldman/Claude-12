@@ -1,7 +1,35 @@
 'use strict';
 /* Finder Viewer — renderer */
 
+// ---------------------------------------------------------------------------
+// Loud, on-screen error reporting — a silent blank window is undebuggable
+// ---------------------------------------------------------------------------
+function showFatalError(msg) {
+  let box = document.getElementById('fatal-error');
+  if (!box) {
+    box = document.createElement('div');
+    box.id = 'fatal-error';
+    box.style.cssText = 'position:fixed;top:60px;left:50%;transform:translateX(-50%);z-index:99999;' +
+      'max-width:80%;max-height:60%;overflow:auto;background:#c62828;color:#fff;padding:14px 18px;' +
+      'border-radius:10px;font:12px/1.5 monospace;white-space:pre-wrap;user-select:text;cursor:text;' +
+      'box-shadow:0 8px 30px rgba(0,0,0,.4)';
+    document.body.appendChild(box);
+  }
+  box.textContent += (box.textContent ? '\n\n' : 'Finder Viewer hit an error:\n\n') + msg;
+}
+window.addEventListener('error', (e) => {
+  showFatalError((e.message || 'Script error') + (e.filename ? `\n  at ${e.filename}:${e.lineno}` : ''));
+});
+window.addEventListener('unhandledrejection', (e) => {
+  const r = e.reason;
+  showFatalError(r && r.stack ? r.stack : String(r));
+});
+
 const api = window.api;
+if (!api) {
+  showFatalError('window.api is missing — the preload script failed to load.');
+  throw new Error('preload missing');
+}
 if (api.platform === 'darwin') document.body.classList.add('mac');
 
 const $ = (s) => document.querySelector(s);
@@ -332,9 +360,13 @@ async function refresh(keepScroll = true) {
   if (res.error) {
     state.entries = [];
     renderContent();
+    emptyEl.style.display = '';
+    emptyEl.textContent = `Can't read this folder: ${res.error}\n\nIf macOS asked for permission and it was denied, allow access in System Settings → Privacy & Security → Files & Folders.`;
+    emptyEl.style.whiteSpace = 'pre-wrap';
     statusEl.textContent = res.error;
     return;
   }
+  emptyEl.textContent = 'This folder is empty';
   state.entries = res.entries;
   // Drop selections for files that no longer exist
   const alive = new Set(state.entries.map(e => e.path));
@@ -1038,6 +1070,14 @@ window.addEventListener('resize', () => {
 // Boot
 // ---------------------------------------------------------------------------
 (async function init() {
+  try {
+    await initInner();
+  } catch (err) {
+    showFatalError('Startup failed:\n' + (err && err.stack ? err.stack : String(err)));
+  }
+})();
+
+async function initInner() {
   const prefs = await api.getPrefs();
   if (prefs.grouping === 'month') state.grouping = 'month';
   if (prefs.view === 'feed') state.view = 'feed';
@@ -1061,4 +1101,4 @@ window.addEventListener('resize', () => {
 
   // Remember last folder
   setInterval(() => { if (state.cwd) api.setPrefs({ lastDir: state.cwd }); }, 4000);
-})();
+}
